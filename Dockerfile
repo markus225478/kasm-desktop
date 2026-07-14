@@ -30,8 +30,12 @@ COPY ./src/ubuntu/install/chromium/ $INST_SCRIPTS/chromium/
 RUN bash $INST_SCRIPTS/chromium/install_chromium.sh && rm -rf $INST_SCRIPTS/chromium/
 
 # Install Obsidian
-COPY ./src/ubuntu/install/obsidian $INST_SCRIPTS/obsidian/
+COPY ./src/ubuntu/install/obsidian/ $INST_SCRIPTS/obsidian/
 RUN bash $INST_SCRIPTS/obsidian/install_obsidian.sh  && rm -rf $INST_SCRIPTS/obsidian/
+
+# Claude Desktop
+COPY ./src/ubuntu/install/claude_code/ $INST_SCRIPTS/claude_code/
+RUN bash $INST_SCRIPTS/claude/install_claude.sh  && rm -rf $INST_SCRIPTS/claude_code/
 
 # Joplin (AppImage)
 RUN VERSION=$(curl -s https://api.github.com/repos/laurent22/joplin/releases/latest | grep '"tag_name"' | cut -d '"' -f 4) \
@@ -39,11 +43,6 @@ RUN VERSION=$(curl -s https://api.github.com/repos/laurent22/joplin/releases/lat
     && chmod +x /tmp/Joplin.AppImage && mkdir -p /opt/joplin && cd /opt/joplin \
     && /tmp/Joplin.AppImage --appimage-extract && rm /tmp/Joplin.AppImage \
     && ln -s /opt/joplin/squashfs-root/AppRun /usr/local/bin/joplin
-
-# Claude Desktop (direkte .deb)
-RUN curl -fLO "https://downloads.claude.ai/claude-desktop/apt/stable/$(curl -s "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-$(dpkg --print-architecture)/Packages" | grep '^Filename: pool/main/c/claude-desktop/claude-desktop_' | sort -V | tail -n 1 | cut -d' ' -f2)" \
-    && apt-get install -y ./claude-desktop_*.deb \
-    && rm claude-desktop_*.deb
 
 # Desktop Icons
 RUN mkdir -p /home/kasm-default-profile/Desktop
