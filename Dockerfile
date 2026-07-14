@@ -40,12 +40,10 @@ RUN VERSION=$(curl -s https://api.github.com/repos/laurent22/joplin/releases/lat
     && /tmp/Joplin.AppImage --appimage-extract && rm /tmp/Joplin.AppImage \
     && ln -s /opt/joplin/squashfs-root/AppRun /usr/local/bin/joplin
 
-# Claude Desktop (AppImage)
-RUN VERSION=$(curl -s https://api.github.com/repos/ClaudeDesktop/ClaudeDesktop/releases/latest | grep '"tag_name"' | cut -d '"' -f 4) \
-    && wget -qO /tmp/Claude.AppImage https://github.com/ClaudeDesktop/ClaudeDesktop/releases/download/${VERSION}/Claude-${VERSION#v}.AppImage \
-    && chmod +x /tmp/Claude.AppImage && mkdir -p /opt/claude && cd /opt/claude \
-    && /tmp/Claude.AppImage --appimage-extract && rm /tmp/Claude.AppImage \
-    && ln -s /opt/claude/squashfs-root/AppRun /usr/local/bin/claude
+# Claude Desktop (direkte .deb)
+RUN curl -fLO "https://downloads.claude.ai/claude-desktop/apt/stable/$(curl -s "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-$(dpkg --print-architecture)/Packages" | grep '^Filename: pool/main/c/claude-desktop/claude-desktop_' | sort -V | tail -n 1 | cut -d' ' -f2)" \
+    && apt-get install -y ./claude-desktop_*.deb \
+    && rm claude-desktop_*.deb
 
 # Desktop Icons
 RUN mkdir -p /home/kasm-default-profile/Desktop
